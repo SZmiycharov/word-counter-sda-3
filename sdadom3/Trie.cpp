@@ -10,68 +10,76 @@ int Trie::totalFactor;
 
 Trie::Trie()
 {
-	root = (TrieNode *)calloc(1, sizeof(TrieNode));
+	root = (Node *)calloc(1, sizeof(Node));
 }
 
-void Trie::insert(char text[], int index, int factor)
+void Trie::insert(char * text, int factor, int arrSize)
 {
-	// Converting the input word 'text'
-	// into a vector for easy processing
-	vector<char> word(text, text + strlen(text));
-	TrieNode * temp = root;
+	Node * temp = root;
 
-	int i = 0;
+	int code = 0;
 
-	while (i < word.size()) {      // Until there is something to process
-		if (temp->children[word[i] - 'a'] == NULL) {
-			// There is no node in 'trie_tree' corresponding to this alphabet
-
-			// Allocate using calloc(), so that components are initialised
-			temp->children[word[i] - 'a'] =
-				(TrieNode *)calloc(1, sizeof(TrieNode));
-			temp->children[word[i] - 'a']->parent = temp; // Assigning parent
+	for (int i = 0; i < arrSize; ++i)
+	{   
+		code = getCode(text[i]);
+		if (temp->children[code] == NULL) 
+		{
+			temp->children[code] = (Node *)calloc(1, sizeof(Node));
+			temp->children[code]->parent = temp;
 		}
 
-		temp = temp->children[word[i] - 'a'];
-		++i;   // Next alphabet
+		temp = temp->children[code];
 	}
 
-	temp->occurrences.push_back(index);      //Mark the occurence of the word
+	temp->factor = factor;
 }
 
-bool Trie::searchWord(TrieNode * trie, char * text, int arrSize)
+bool Trie::searchWord(char * text, int arrSize)
 {
-	// Functions very similar to insert() function
 	vector<char> word(text, text + strlen(text));
-	TrieNode * temp = trie;
+	Node * temp = root;
+	int code = 0;
+	int counter = 0;
 
-	while (word.size() != 0) {
-		if (temp->children[word[0] - 'a'] != NULL) {
-			temp = temp->children[word[0] - 'a'];
-			word.erase(word.begin());
-		}
-		else {
+	for (int i = 0; i < arrSize; ++i)
+	{
+		counter++;
+		code = getCode(text[i]);
+		if (temp->children[code] == NULL)
+		{
 			break;
 		}
+		else
+		{
+			temp = temp->children[code];
+		}
+
+		
 	}
 
-	if (word.size() == 0 && temp->occurrences.size() != 0) {
-		// Word found
+	if (counter == arrSize && temp->factor != 0) 
+	{
+		cout << "YES BE NAMERIHME Q!\n";
 		return true;
 	}
 	else {
-		// Word not found
 		return false;
 	}
 }
 
 int Trie::getCode(char ch)
 {
+	//return 0-25 for a-z and A-Z and -33 for "space"
+
 	int code = int(ch) - 97;
 	//for uppercase letters
 	if (code < 0)
 	{
 		code += 32;
+	}
+	if (code == -33)
+	{
+		return 26;
 	}
 	return code;
 }

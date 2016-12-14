@@ -40,9 +40,9 @@ int getCode(char ch)
 
 int main(int argc, char* argv[])
 {
-	// getcode returns 0 to 25 for the characters and -17 for the '0'
+	// getcode returns 0 to 25 for the characters and -33 for the ' '
 	/*string upper = "0ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	string lower = "0abcdefghijklmnopqrstuvwxyz";
+	string lower = " abcdefghijklmnopqrstuvwxyz";
 	for (int i = 0; i < 26; i++)
 	{
 		cout << getCode(upper[i]) << " ";
@@ -57,13 +57,23 @@ int main(int argc, char* argv[])
 
 
 
-	Trie test;
+	/*Trie test;
 
 	test.insert("test", 0, 5);
 	test.insert("yolo", 1, 10);
 	test.insert("wtf", 2, -3);
 
-	test.searchWord(test.root, "12345", 5);
+	test.searchWord("12345", 5);*/
+
+	Trie test;
+	test.insert("test", 10, 4);
+	test.insert("testa", 20, 5);
+	test.insert("testb", 30, 5);
+	test.insert("tes tc", 40, 6);
+	test.insert("testd", 50, 5);
+	test.insert("testg", 60, 5);
+
+	cout << "func returns: " << test.searchWord("tes tc", 6) << endl;
 
 
 	//Vector <char> word;

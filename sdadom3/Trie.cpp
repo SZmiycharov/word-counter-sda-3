@@ -53,16 +53,15 @@ bool Trie::searchWord(char * text, int arrSize)
 		{
 			temp = temp->children[code];
 		}
-
-		
 	}
 
-	if (counter == arrSize && temp->factor != 0) 
+	if (counter == arrSize) 
 	{
-		cout << "YES BE NAMERIHME Q!\n";
+		totalFactor += temp->factor;
 		return true;
 	}
-	else {
+	else 
+	{
 		return false;
 	}
 }

@@ -43,7 +43,7 @@ bool Trie::searchWord(char * text, int arrSize)
 
 	for (int i = 0; i < arrSize; ++i)
 	{
-		counter++;
+		
 		code = getCode(text[i]);
 		if (temp->children[code] == NULL)
 		{
@@ -52,6 +52,7 @@ bool Trie::searchWord(char * text, int arrSize)
 		else
 		{
 			temp = temp->children[code];
+			counter++;
 		}
 	}
 

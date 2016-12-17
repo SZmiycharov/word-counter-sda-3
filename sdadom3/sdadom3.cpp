@@ -27,6 +27,14 @@
 
 using namespace std;
 
+bool isWordDelimeter(char ch)
+{
+	return (ch == ' ' || ch == ',' || ch == '.' || ch == '!' || ch == '?'
+		|| ch == '-' || ch == '.' || ch == '.' || ch == '.' || ch == '.'
+		|| ch == '.' || ch == '.' || ch == '.' || ch == '.' || ch == '.'
+		|| ch == '.' || ch == '.' || ch == '.' || ch == '.' || ch == '.');
+}
+
 int getCode(char ch)
 {
 	//return 0-25 for a-z and A-Z and 26 for "space"
@@ -46,33 +54,7 @@ int getCode(char ch)
 
 int main(int argc, char* argv[])
 {
-	// getcode returns 0 to 25 for the characters and -33 for the ' '
-	/*string upper = "0ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	string lower = " abcdefghijklmnopqrstuvwxyz";
-	for (int i = 0; i < 26; i++)
-	{
-		cout << getCode(upper[i]) << " ";
-	}
-	cout << endl;
-	for (int i = 0; i < 26; i++)
-	{
-		cout << getCode(lower[i]) << " ";
-	}
-
-	cout << endl;*/
-
-
-
-	/*Trie test;
-
-	test.insert("test", 0, 5);
-	test.insert("yolo", 1, 10);
-	test.insert("wtf", 2, -3);
-
-	test.searchWord("12345", 5);*/
-
 	Trie dict;
-
 
 	if (argc < 3)
 	{
@@ -86,7 +68,7 @@ int main(int argc, char* argv[])
 	char number[1000];
 	char ch;
 
-	int arrSize = 0;
+	
 	int phraseSize = 0;
 	int numberSize = 0;
 	int factor = 0;
@@ -109,14 +91,8 @@ int main(int argc, char* argv[])
 			else if (int(ch) == 10)
 			{
 				istringstream(number) >> factor;
-				cout << "*";
-				for (int i = 0; i < phraseSize - 1; i++)
-				{
-					cout << phrase[i];
-				}
-				cout << "*" << endl;
-
 				dict.insert(phrase, factor, phraseSize - 1);
+
 				for (int i = 0; i < numberSize; i++)
 				{
 					number[i] = '.';
@@ -126,18 +102,12 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
-				cout << "CHAR: '" << ch << "' NOT ALLOWED!" << endl;
+				cout << "CHAR: '" << ch << "' IS NOT ALLOWED!" << endl;
 				std::system("pause");
 				exit(EXIT_FAILURE);
 			}
 		}
 		istringstream(number) >> factor;
-		cout << "*";
-		for (int i = 0; i < phraseSize - 1; i++)
-		{
-			cout << phrase[i];
-		}
-		cout << "*" << endl;
 		dict.insert(phrase, factor, phraseSize - 1);
 	}
 	else
@@ -146,54 +116,107 @@ int main(int argc, char* argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	cout << dict.searchWord("algorithm baby the best ", 23);
 
-	// 48 to 57 are the digits!!!
+	/*cout << dict.searchWord("algorithm", 9) << endl;
+	cout << dict.searchWord("selection sort", 14) << endl;
+	cout << dict.searchWord("programs", 8) << endl;
+	cout << dict.searchWord("program", 7) << endl;
+	cout << dict.searchWord("viagra", 6) << endl;*/
 
-	//for (int i = 2; i < argc; i++)
-	//{
-	//	ifstream wordFile(argv[i]);
-	//	cout << "\nfile: " << argv[i] << endl;
+	
 
-	//	if (wordFile.is_open())
-	//	{			
-	//		arrSize = 0;
-	//		while (wordFile >> noskipws >> ch)
-	//		{
-	//			//if it is a letter
-	//			if (-1 < getCode(ch) && getCode(ch) < 26)
-	//			{
-	//				cout << ch;
-	//				buffer[arrSize] = ch;
-	//				++arrSize;
-	//				
-	//			}
-	//			else
-	//			{
-	//				if (!(test.searchWord(buffer, arrSize)))
-	//				{
-	//					arrSize = 0;
-	//				}
-	//				else
-	//				{
-	//					buffer[arrSize] = ' ';
-	//				}
 
-	//				arrSize = 0;
-	//			}
-	//		}
-	//		cout << " " << test.searchWord(buffer, arrSize) << " ";
+	int arrSize = 0;
+	int lastTotalFactor = 0;
+	int wordCount = 0;
 
-	//		wordFile.close();
-	//	}
-	//	else
-	//	{
-	//		cerr << "Unable to open file " << argv[i] << "\n";
-	//		exit(EXIT_FAILURE);
-	//	}
-	//}
-	//
-	//cout << "\ntotalfactor: " << Trie::totalFactor << endl;
+	for (int i = 2; i < argc; i++)
+	{
+		ifstream wordFile(argv[i]);
+		cout << "\nfile: " << argv[i] << endl;
+
+		if (wordFile.is_open())
+		{			
+			arrSize = 0;
+			for (int i = 0; i < arrSize; i++)
+			{
+				buffer[i] = '\0';
+			}
+			while (wordFile >> noskipws >> ch)
+			{
+				
+
+
+				//if it is a letter
+				if (-1 < getCode(ch) && getCode(ch) < 26)
+				{
+ 					buffer[arrSize] = ch;
+					++arrSize;					
+				}
+				else
+				{
+					if (arrSize > 0)
+					{
+						++wordCount;
+					}
+					if (!(dict.searchWord(buffer, arrSize)))
+					{
+						cout << "arrsize: " << arrSize << "; ";
+						cout << "*";
+						for (int i = 0; i < arrSize; i++)
+						{
+							cout << buffer[i];
+						}
+						cout << "* ";
+						cout << "word not found!!!\n";
+						for (int i = 0; i < arrSize; i++)
+						{
+							buffer[i] = '\0';
+						}
+						arrSize = 0;
+					}
+					else
+					{
+						cout << "arrsize: " << arrSize << "; ";
+						cout << "*";
+						for (int i = 0; i < arrSize; i++)
+						{
+							cout << buffer[i];
+						}
+						cout << "* ";
+						cout << "found it! Factor: " << Trie::totalFactor << "\n";
+
+						if (lastTotalFactor == Trie::totalFactor)
+						{
+							buffer[arrSize] = ' ';
+							++arrSize;
+						}
+						else
+						{
+							for (int i = 0; i < arrSize; i++)
+							{
+								buffer[i] = '\0';
+							}
+							arrSize = 0;
+						}
+						
+						lastTotalFactor = Trie::totalFactor;
+					}
+				}
+			}
+			wordFile.close();
+		}
+		else
+		{
+			cerr << "Unable to open file " << argv[i] << "\n";
+			exit(EXIT_FAILURE);
+		}
+	}
+	
+	cout << "\ntotalfactor: " << Trie::totalFactor << endl;
+	cout << "wordcount: " << wordCount << endl;
+
+	cout << "FINALRESULT: " << Trie::totalFactor / wordCount << endl;
 
 	std::system("pause");
 	return 0;

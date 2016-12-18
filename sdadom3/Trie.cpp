@@ -29,30 +29,6 @@ Trie::~Trie()
 	delete root;
 }
 
-//void Trie::deleteAll(Node * root)
-//{
-//	cout << "in deleteall\n";
-//	for (int i = 0; i < symbolsCount; i++)
-//	{
-//		if (root->children[i] != NULL)
-//		{
-//			cout << root->children[i] << endl;
-//			deleteAll(root->children[i]);
-//		}
-//	}
-//	
-//	for (int i = 0; i < symbolsCount; i++)
-//	{
-//		if (root->children[i] != NULL)
-//		{
-//			cout << "deleting child!" << endl;
-//			delete root->children[i];
-//		}
-//	}
-//
-//	//delete root;
-//}
-
 void Trie::insert(char * text, int factor, int arrSize)
 {
 	Node * temp = root;
@@ -76,7 +52,8 @@ void Trie::insert(char * text, int factor, int arrSize)
 
 bool Trie::searchWord(char * text, int arrSize)
 {
-	vector<char> word(text, text + strlen(text));
+	if (arrSize == 0) return false;
+
 	Node * temp = root;
 	int code = 0;
 	int counter = 0;

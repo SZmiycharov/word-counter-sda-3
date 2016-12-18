@@ -1,4 +1,3 @@
-#include <vector>
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -30,6 +29,5 @@ private:
 	};
 	Node * root;
 
-	//void deleteAll(Node * root);
 	int getCode(char ch);
 };

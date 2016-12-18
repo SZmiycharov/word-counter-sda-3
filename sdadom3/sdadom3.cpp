@@ -147,7 +147,7 @@ double calculateFactor(int argc, char* argv[], int &wordCount, Trie &dict)
 				{
 					// ako imame pone 1 bukva v buffera
 					if (arrSize > 0 &&
-						getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25)
+						((getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25) || (getCode(buffer[1]) >= 0 && getCode(buffer[1]) <= 25)))
 					{
 						++wordCount;
 					}
@@ -207,20 +207,24 @@ int main(int argc, char* argv[])
 	Trie dict;
 	int wordCount = 0;
 
-	populateDictionary(argv[1], dict);
-
 	clock_t begin = clock();
 
-	double factor = calculateFactor(argc, argv, wordCount, dict);
+	populateDictionary(argv[1], dict);
 
+	double factor = calculateFactor(argc, argv, wordCount, dict);
 	clock_t end = clock();
 
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
 	
-	cout << "\ntotalfactor: " << factor << endl;
+	cout << "totalfactor: " << factor << endl;
 	cout << "wordcount: " << wordCount << endl;
 
-	double result = factor / double(wordCount);
+	double result = 0;
+	if (wordCount != 0)
+	{
+		result = factor / double(wordCount);
+	}
+	
 	cout << "FINALRESULT: " << result << endl;
 	cout << "elapsed time: " << elapsed_secs << "s" << endl;
 

@@ -43,7 +43,6 @@ bool Trie::searchWord(char * text, int arrSize)
 
 	for (int i = 0; i < arrSize; ++i)
 	{
-		
 		code = getCode(text[i]);
 		if (temp->children[code] == NULL)
 		{

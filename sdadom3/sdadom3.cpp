@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <ctime>
 #include "Trie.h"
 #include "Vector.h"
 
@@ -52,42 +53,33 @@ int getCode(char ch)
 	return code;
 }
 
-int main(int argc, char* argv[])
+void populateDictionary(char* filename, Trie &dict)
 {
-	Trie dict;
-
-	if (argc < 3)
-	{
-		cerr << "Usage: " << argv[0] << " <FILENAME 1> <FILENAME 2> ... <FILENAME N>" << "\n";
-		std::system("pause");
-		exit(EXIT_FAILURE);
-	}
-
 	char buffer[100];
 	char phrase[1000];
 	char number[1000];
 	char ch;
-
-	
 	int phraseSize = 0;
 	int numberSize = 0;
 	int factor = 0;
-	
-	ifstream dictionaryFile(argv[1]);
+	ifstream dictionaryFile(filename);
 	if (dictionaryFile.is_open())
 	{
 		while (dictionaryFile >> noskipws >> ch)
 		{
+			//chars and space
 			if (-1 < getCode(ch) && getCode(ch) < 27)
 			{
 				phrase[phraseSize] = ch;
 				++phraseSize;
 			}
-			else if (int(ch) == 45 || (48 <= int(ch) && int(ch) <= 57)) 
+			//digits and - (for -200)
+			else if (int(ch) == 45 || (48 <= int(ch) && int(ch) <= 57))
 			{
 				number[numberSize] = ch;
 				++numberSize;
 			}
+			//enter
 			else if (int(ch) == 10)
 			{
 				istringstream(number) >> factor;
@@ -112,80 +104,56 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		cerr << "Unable to open file " << argv[1] << "\n";
+		cerr << "Unable to open file " << filename << "\n";
 		exit(EXIT_FAILURE);
 	}
+}
 
-
-	/*cout << dict.searchWord("algorithm", 9) << endl;
-	cout << dict.searchWord("selection sort", 14) << endl;
-	cout << dict.searchWord("programs", 8) << endl;
-	cout << dict.searchWord("program", 7) << endl;
-	cout << dict.searchWord("viagra", 6) << endl;*/
-
-	
-
-
+void calculateFactor(int argc, char* argv[], int &wordCount, Trie dict)
+{
+	char buffer[100];
+	char phrase[1000];
+	char number[1000];
+	char ch;
+	int phraseSize = 0;
+	int numberSize = 0;
+	int factor = 0;
 	int arrSize = 0;
 	int lastTotalFactor = 0;
-	int wordCount = 0;
 
 	for (int i = 2; i < argc; i++)
 	{
 		ifstream wordFile(argv[i]);
-		cout << "\nfile: " << argv[i] << endl;
 
 		if (wordFile.is_open())
-		{			
+		{
 			arrSize = 0;
-			for (int i = 0; i < arrSize; i++)
-			{
-				buffer[i] = '\0';
-			}
+			buffer[0] = '\0';
+
 			while (wordFile >> noskipws >> ch)
 			{
-				
-
-
 				//if it is a letter
 				if (-1 < getCode(ch) && getCode(ch) < 26)
 				{
- 					buffer[arrSize] = ch;
-					++arrSize;					
+					buffer[arrSize] = ch;
+					++arrSize;
 				}
 				else
 				{
-					if (arrSize > 0)
+					if (arrSize > 0 &&
+						(arrSize>1 ||
+						(int(buffer[0]) != 9 && int(buffer[0]) != 10 && int(buffer[0]) != 11 && int(buffer[0]) != 32)))
 					{
+
 						++wordCount;
 					}
 					if (!(dict.searchWord(buffer, arrSize)))
 					{
-						cout << "arrsize: " << arrSize << "; ";
-						cout << "*";
-						for (int i = 0; i < arrSize; i++)
-						{
-							cout << buffer[i];
-						}
-						cout << "* ";
-						cout << "word not found!!!\n";
-						for (int i = 0; i < arrSize; i++)
-						{
-							buffer[i] = '\0';
-						}
+						buffer[0] = '\0';
 						arrSize = 0;
 					}
-					else
+					else if (int(ch) == 9 || int(ch) == 10 || int(ch) == 11 || int(ch) == 32)
 					{
-						cout << "arrsize: " << arrSize << "; ";
-						cout << "*";
-						for (int i = 0; i < arrSize; i++)
-						{
-							cout << buffer[i];
-						}
-						cout << "* ";
-						cout << "found it! Factor: " << Trie::totalFactor << "\n";
-
 						if (lastTotalFactor == Trie::totalFactor)
 						{
 							buffer[arrSize] = ' ';
@@ -193,17 +161,28 @@ int main(int argc, char* argv[])
 						}
 						else
 						{
-							for (int i = 0; i < arrSize; i++)
-							{
-								buffer[i] = '\0';
-							}
+							buffer[0] = '\0';
 							arrSize = 0;
 						}
-						
+
 						lastTotalFactor = Trie::totalFactor;
+					}
+					else
+					{
+						buffer[0] = '\0';
+						arrSize = 0;
 					}
 				}
 			}
+			//for the last word in file
+			if (arrSize > 0 &&
+				(arrSize>1 ||
+				(int(buffer[0]) != 9 && int(buffer[0]) != 10 && int(buffer[0]) != 11 && int(buffer[0]) != 32)))
+			{
+
+				++wordCount;
+			}
+			dict.searchWord(buffer, arrSize);
 			wordFile.close();
 		}
 		else
@@ -212,11 +191,51 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 	}
-	
+}
+
+int main(int argc, char* argv[])
+{
+	if (argc < 3)
+	{
+		cerr << "Usage: " << argv[0] << " <FILENAME 1> <FILENAME 2> ... <FILENAME N>" << "\n";
+		std::system("pause");
+		exit(EXIT_FAILURE);
+	}
+
+	char buffer[100];
+	char phrase[1000];
+	char number[1000];
+	char ch;
+	int phraseSize = 0;
+	int numberSize = 0;
+	int factor = 0;
+
+	Trie dict;
+
+	populateDictionary(argv[1], dict);
+
+	/*cout << dict.searchWord("algorithm", 9) << endl;
+	cout << dict.searchWord("selection sort", 14) << endl;
+	cout << dict.searchWord("programs", 8) << endl;
+	cout << dict.searchWord("program", 7) << endl;
+	cout << dict.searchWord("viagra", 6) << endl;*/
+
+	int arrSize = 0;
+	int lastTotalFactor = 0;
+	int wordCount = 0;
+
+	clock_t begin = clock();
+
+	calculateFactor(argc, argv, wordCount, dict);
+
+	clock_t end = clock();
+	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+	cout << "elapsed time: " << elapsed_secs << "s" << endl;
 	cout << "\ntotalfactor: " << Trie::totalFactor << endl;
 	cout << "wordcount: " << wordCount << endl;
 
-	cout << "FINALRESULT: " << Trie::totalFactor / wordCount << endl;
+	double result = Trie::totalFactor / double(wordCount);
+	cout << "FINALRESULT: " << result << endl;
 
 	std::system("pause");
 	return 0;

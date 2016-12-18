@@ -14,6 +14,7 @@ public:
 	static int totalFactor;
 	
 	Trie();
+	~Trie();
 
 	void insert(char text[], int factor, int arrSize);
 	bool searchWord(char * text, int arrSize);
@@ -25,8 +26,10 @@ private:
 			Node * parent;
 			Node * children[symbolsCount];
 			int factor;
+			~Node();
 	};
 	Node * root;
 
+	//void deleteAll(Node * root);
 	int getCode(char ch);
 };

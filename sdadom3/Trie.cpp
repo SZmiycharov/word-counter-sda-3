@@ -8,10 +8,50 @@
 
 int Trie::totalFactor;
 
+Trie::Node::~Node()
+{
+	for (int i = 0; i < symbolsCount; i++)
+	{
+		if (children[i] != NULL)
+		{
+			delete children[i];
+		}	
+	}
+}
+
 Trie::Trie()
 {
 	root = (Node *)calloc(1, sizeof(Node));
 }
+
+Trie::~Trie()
+{
+	delete root;
+}
+
+//void Trie::deleteAll(Node * root)
+//{
+//	cout << "in deleteall\n";
+//	for (int i = 0; i < symbolsCount; i++)
+//	{
+//		if (root->children[i] != NULL)
+//		{
+//			cout << root->children[i] << endl;
+//			deleteAll(root->children[i]);
+//		}
+//	}
+//	
+//	for (int i = 0; i < symbolsCount; i++)
+//	{
+//		if (root->children[i] != NULL)
+//		{
+//			cout << "deleting child!" << endl;
+//			delete root->children[i];
+//		}
+//	}
+//
+//	//delete root;
+//}
 
 void Trie::insert(char * text, int factor, int arrSize)
 {

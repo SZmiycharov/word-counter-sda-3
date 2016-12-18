@@ -28,6 +28,12 @@
 
 using namespace std;
 
+void clearCharArray(char &element, int &arrSize)
+{
+	element = '\0';
+	arrSize = 0;
+}
+
 bool isWordDelimeter(char ch)
 {
 	return (ch == ' ' || ch == ',' || ch == '.' || ch == '!' || ch == '?'
@@ -109,10 +115,9 @@ void populateDictionary(char* filename, Trie &dict)
 	}
 }
 
-void calculateFactor(int argc, char* argv[], int &wordCount, Trie dict)
+double calculateFactor(int argc, char* argv[], int &wordCount, Trie &dict)
 {
 	char buffer[100];
-	char phrase[1000];
 	char number[1000];
 	char ch;
 	int phraseSize = 0;
@@ -127,8 +132,7 @@ void calculateFactor(int argc, char* argv[], int &wordCount, Trie dict)
 
 		if (wordFile.is_open())
 		{
-			arrSize = 0;
-			buffer[0] = '\0';
+			clearCharArray(buffer[0], arrSize);
 
 			while (wordFile >> noskipws >> ch)
 			{
@@ -138,6 +142,7 @@ void calculateFactor(int argc, char* argv[], int &wordCount, Trie dict)
 					buffer[arrSize] = ch;
 					++arrSize;
 				}
+				//if it is not a letter ( it is word delimeter (everything except letter) )
 				else
 				{
 					// ako imame pone 1 bukva v buffera
@@ -149,8 +154,7 @@ void calculateFactor(int argc, char* argv[], int &wordCount, Trie dict)
 
 					if (!(dict.searchWord(buffer, arrSize)))
 					{
-						buffer[0] = '\0';
-						arrSize = 0;
+						clearCharArray(buffer[0], arrSize);
 					}
 					else if (int(ch) == 9 || int(ch) == 10 || int(ch) == 11 || int(ch) == 32)
 					{
@@ -161,16 +165,14 @@ void calculateFactor(int argc, char* argv[], int &wordCount, Trie dict)
 						}
 						else
 						{
-							buffer[0] = '\0';
-							arrSize = 0;
+							clearCharArray(buffer[0], arrSize);
 						}
 
 						lastTotalFactor = Trie::totalFactor;
 					}
 					else
 					{
-						buffer[0] = '\0';
-						arrSize = 0;
+						clearCharArray(buffer[0], arrSize);
 					}
 				}
 			}
@@ -190,6 +192,7 @@ void calculateFactor(int argc, char* argv[], int &wordCount, Trie dict)
 			exit(EXIT_FAILURE);
 		}
 	}
+	return Trie::totalFactor;
 }
 
 int main(int argc, char* argv[])
@@ -201,36 +204,25 @@ int main(int argc, char* argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	char buffer[100];
-	char phrase[1000];
-	char number[1000];
-	char ch;
-	int phraseSize = 0;
-	int numberSize = 0;
-	int factor = 0;
-
 	Trie dict;
+	int wordCount = 0;
 
 	populateDictionary(argv[1], dict);
 
-	/*cout << dict.searchWord("selection sort", 14) << endl;*/
-
-	int arrSize = 0;
-	int lastTotalFactor = 0;
-	int wordCount = 0;
-
 	clock_t begin = clock();
 
-	calculateFactor(argc, argv, wordCount, dict);
+	double factor = calculateFactor(argc, argv, wordCount, dict);
 
 	clock_t end = clock();
+
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	cout << "elapsed time: " << elapsed_secs << "s" << endl;
-	cout << "\ntotalfactor: " << Trie::totalFactor << endl;
+	
+	cout << "\ntotalfactor: " << factor << endl;
 	cout << "wordcount: " << wordCount << endl;
 
-	double result = Trie::totalFactor / double(wordCount);
+	double result = factor / double(wordCount);
 	cout << "FINALRESULT: " << result << endl;
+	cout << "elapsed time: " << elapsed_secs << "s" << endl;
 
 	std::system("pause");
 	return 0;

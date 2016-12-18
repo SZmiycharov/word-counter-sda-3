@@ -140,13 +140,13 @@ void calculateFactor(int argc, char* argv[], int &wordCount, Trie dict)
 				}
 				else
 				{
+					// ako imame pone 1 bukva v buffera
 					if (arrSize > 0 &&
-						(arrSize>1 ||
-						(int(buffer[0]) != 9 && int(buffer[0]) != 10 && int(buffer[0]) != 11 && int(buffer[0]) != 32)))
+						getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25)
 					{
-
 						++wordCount;
 					}
+
 					if (!(dict.searchWord(buffer, arrSize)))
 					{
 						buffer[0] = '\0';
@@ -179,7 +179,6 @@ void calculateFactor(int argc, char* argv[], int &wordCount, Trie dict)
 				(arrSize>1 ||
 				(int(buffer[0]) != 9 && int(buffer[0]) != 10 && int(buffer[0]) != 11 && int(buffer[0]) != 32)))
 			{
-
 				++wordCount;
 			}
 			dict.searchWord(buffer, arrSize);
@@ -214,11 +213,7 @@ int main(int argc, char* argv[])
 
 	populateDictionary(argv[1], dict);
 
-	/*cout << dict.searchWord("algorithm", 9) << endl;
-	cout << dict.searchWord("selection sort", 14) << endl;
-	cout << dict.searchWord("programs", 8) << endl;
-	cout << dict.searchWord("program", 7) << endl;
-	cout << dict.searchWord("viagra", 6) << endl;*/
+	/*cout << dict.searchWord("selection sort", 14) << endl;*/
 
 	int arrSize = 0;
 	int lastTotalFactor = 0;

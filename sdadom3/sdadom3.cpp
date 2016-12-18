@@ -14,17 +14,10 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <sstream>
 #include <assert.h>
-#include <stdlib.h>
-#include <vector>
 #include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <ctime>
 #include "Trie.h"
-#include "Vector.h"
 
 using namespace std;
 
@@ -32,14 +25,6 @@ void clearCharArray(char &element, int &arrSize)
 {
 	element = '\0';
 	arrSize = 0;
-}
-
-bool isWordDelimeter(char ch)
-{
-	return (ch == ' ' || ch == ',' || ch == '.' || ch == '!' || ch == '?'
-		|| ch == '-' || ch == '.' || ch == '.' || ch == '.' || ch == '.'
-		|| ch == '.' || ch == '.' || ch == '.' || ch == '.' || ch == '.'
-		|| ch == '.' || ch == '.' || ch == '.' || ch == '.' || ch == '.');
 }
 
 int getCode(char ch)
@@ -61,14 +46,15 @@ int getCode(char ch)
 
 void populateDictionary(char* filename, Trie &dict)
 {
-	char buffer[100];
-	char phrase[1000];
+	char phrase[10000];
 	char number[1000];
 	char ch;
 	int phraseSize = 0;
 	int numberSize = 0;
 	int factor = 0;
+
 	ifstream dictionaryFile(filename);
+	
 	if (dictionaryFile.is_open())
 	{
 		while (dictionaryFile >> noskipws >> ch)
@@ -88,14 +74,15 @@ void populateDictionary(char* filename, Trie &dict)
 			//enter
 			else if (int(ch) == 10)
 			{
-				istringstream(number) >> factor;
+				assert(istringstream(number) >> factor);
 				dict.insert(phrase, factor, phraseSize - 1);
 
 				for (int i = 0; i < numberSize; i++)
 				{
 					number[i] = '.';
 				}
-				numberSize = 0;
+
+				clearCharArray(number[0], numberSize);
 				phraseSize = 0;
 			}
 			else
@@ -105,7 +92,7 @@ void populateDictionary(char* filename, Trie &dict)
 				exit(EXIT_FAILURE);
 			}
 		}
-		istringstream(number) >> factor;
+		assert(istringstream(number) >> factor);
 		dict.insert(phrase, factor, phraseSize - 1);
 	}
 	else
@@ -117,11 +104,8 @@ void populateDictionary(char* filename, Trie &dict)
 
 double calculateFactor(int argc, char* argv[], int &wordCount, Trie &dict)
 {
-	char buffer[100];
-	char number[1000];
+	char buffer[10000];
 	char ch;
-	int phraseSize = 0;
-	int numberSize = 0;
 	int factor = 0;
 	int arrSize = 0;
 	int lastTotalFactor = 0;
@@ -145,9 +129,9 @@ double calculateFactor(int argc, char* argv[], int &wordCount, Trie &dict)
 				//if it is not a letter ( it is word delimeter (everything except letter) )
 				else
 				{
-					// ako imame pone 1 bukva v buffera
+					// if there is at least 1 letter in buffer
 					if (arrSize > 0 &&
-						((getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25) || (getCode(buffer[1]) >= 0 && getCode(buffer[1]) <= 25)))
+						(getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25))
 					{
 						++wordCount;
 					}
@@ -178,11 +162,11 @@ double calculateFactor(int argc, char* argv[], int &wordCount, Trie &dict)
 			}
 			//for the last word in file
 			if (arrSize > 0 &&
-				(arrSize>1 ||
-				(int(buffer[0]) != 9 && int(buffer[0]) != 10 && int(buffer[0]) != 11 && int(buffer[0]) != 32)))
+				(getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25))
 			{
 				++wordCount;
 			}
+
 			dict.searchWord(buffer, arrSize);
 			wordFile.close();
 		}
@@ -207,17 +191,8 @@ int main(int argc, char* argv[])
 	Trie dict;
 	int wordCount = 0;
 
-	clock_t begin = clock();
-
 	populateDictionary(argv[1], dict);
-
 	double factor = calculateFactor(argc, argv, wordCount, dict);
-	clock_t end = clock();
-
-	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	
-	cout << "totalfactor: " << factor << endl;
-	cout << "wordcount: " << wordCount << endl;
 
 	double result = 0;
 	if (wordCount != 0)
@@ -225,10 +200,8 @@ int main(int argc, char* argv[])
 		result = factor / double(wordCount);
 	}
 	
-	cout << "FINALRESULT: " << result << endl;
-	cout << "elapsed time: " << elapsed_secs << "s" << endl;
+	cout << result << endl;
 
 	std::system("pause");
 	return 0;
 }
-

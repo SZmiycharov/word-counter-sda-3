@@ -1,10 +1,20 @@
+/**
+*
+* Solution to homework task
+* Data Structures Course
+* Faculty of Mathematics and Informatics of Sofia University
+* Winter semester 2016/2017
+*
+* @author Stanislav Zmiycharov
+* @idnumber 61883
+* @task 3
+* @compiler VC
+*
+*/
+
 #include <cstdlib>
-#include <cstdio>
-#include <cstring>
 
-using namespace std;
-
-//english alphabet + space
+//english alphabet (26 letters) + space
 const int symbolsCount = 27;
 
 class Trie
@@ -25,6 +35,7 @@ private:
 			Node * parent;
 			Node * children[symbolsCount];
 			int factor;
+			Node();
 			~Node();
 	};
 	Node * root;

@@ -1,9 +1,17 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <assert.h>
-#include <stdlib.h>
+/**
+*
+* Solution to homework task
+* Data Structures Course
+* Faculty of Mathematics and Informatics of Sofia University
+* Winter semester 2016/2017
+*
+* @author Stanislav Zmiycharov
+* @idnumber 61883
+* @task 3
+* @compiler VC
+*
+*/
+
 #include "Trie.h"
 
 int Trie::totalFactor;
@@ -85,7 +93,7 @@ bool Trie::searchWord(char * text, int arrSize)
 
 int Trie::getCode(char ch)
 {
-	//return 0-25 for a-z and A-Z and -33 for "space"
+	//return 0-25 for a-z and A-Z and 26 for "space"
 
 	int code = int(ch) - 97;
 	//for uppercase letters
@@ -93,9 +101,11 @@ int Trie::getCode(char ch)
 	{
 		code += 32;
 	}
+
 	if (code == -33)
 	{
 		return 26;
 	}
+	
 	return code;
 }

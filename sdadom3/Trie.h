@@ -35,7 +35,6 @@ private:
 			Node * parent;
 			Node * children[symbolsCount];
 			int factor;
-			Node();
 			~Node();
 	};
 	Node * root;

@@ -21,10 +21,10 @@
 
 using namespace std;
 
-void clearCharArray(char &element, int &arrSize)
+void clearCharArray(char &element, int &buffSize)
 {
 	element = '\0';
-	arrSize = 0;
+	buffSize = 0;
 }
 
 int getCode(char ch)
@@ -44,7 +44,7 @@ int getCode(char ch)
 	return code;
 }
 
-void populateDictionary(char* filename, Trie &dict)
+void populateDictionary(char* fileName, Trie &dict)
 {
 	char phrase[10000];
 	char number[1000];
@@ -53,8 +53,8 @@ void populateDictionary(char* filename, Trie &dict)
 	int numberSize = 0;
 	int factor = 0;
 
-	ifstream dictionaryFile(filename);
-	
+	ifstream dictionaryFile(fileName);
+
 	if (dictionaryFile.is_open())
 	{
 		while (dictionaryFile >> noskipws >> ch)
@@ -88,7 +88,7 @@ void populateDictionary(char* filename, Trie &dict)
 			else
 			{
 				cout << "CHAR: '" << ch << "' IS NOT ALLOWED!" << endl;
-				std::system("pause");
+				system("pause");
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -97,85 +97,84 @@ void populateDictionary(char* filename, Trie &dict)
 	}
 	else
 	{
-		cerr << "Unable to open file " << filename << "\n";
+		cerr << "Unable to open file " << fileName << "\n";
 		exit(EXIT_FAILURE);
 	}
 }
 
-double calculateFactor(int argc, char* argv[], int &wordCount, Trie &dict)
+double calculateFactor(char* fileName, int &wordCount, Trie &dict)
 {
 	char buffer[10000];
 	char ch;
 	int factor = 0;
-	int arrSize = 0;
+	int buffSize = 0;
 	int lastTotalFactor = 0;
+	bool incrementedWord = false;
 
-	for (int i = 2; i < argc; i++)
+	ifstream wordFile(fileName);
+
+	if (wordFile.is_open())
 	{
-		ifstream wordFile(argv[i]);
+		clearCharArray(buffer[0], buffSize);
 
-		if (wordFile.is_open())
+		while (wordFile >> noskipws >> ch)
 		{
-			clearCharArray(buffer[0], arrSize);
-
-			while (wordFile >> noskipws >> ch)
+			//if it is a letter
+			if (-1 < getCode(ch) && getCode(ch) < 26)
 			{
-				//if it is a letter
-				if (-1 < getCode(ch) && getCode(ch) < 26)
+				buffer[buffSize] = ch;
+				++buffSize;
+			}
+			//if it is not a letter ( it is word delimeter (everything except letter) )
+			else
+			{
+				// if there is at least 1 letter in buffer
+				if (buffSize > 0 &&
+					(getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25))
 				{
-					buffer[arrSize] = ch;
-					++arrSize;
+					++wordCount;
 				}
-				//if it is not a letter ( it is word delimeter (everything except letter) )
-				else
+
+				if (!(dict.searchWord(buffer, buffSize)))
 				{
-					// if there is at least 1 letter in buffer
-					if (arrSize > 0 &&
-						(getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25))
+					clearCharArray(buffer[0], buffSize);
+				}
+				else if (int(ch) == 9 || int(ch) == 10 || int(ch) == 11 || int(ch) == 32)
+				{
+					if (lastTotalFactor == Trie::totalFactor)
 					{
-						++wordCount;
-					}
-
-					if (!(dict.searchWord(buffer, arrSize)))
-					{
-						clearCharArray(buffer[0], arrSize);
-					}
-					else if (int(ch) == 9 || int(ch) == 10 || int(ch) == 11 || int(ch) == 32)
-					{
-						if (lastTotalFactor == Trie::totalFactor)
-						{
-							buffer[arrSize] = ' ';
-							++arrSize;
-						}
-						else
-						{
-							clearCharArray(buffer[0], arrSize);
-						}
-
-						lastTotalFactor = Trie::totalFactor;
+						buffer[buffSize] = ' ';
+						++buffSize;
 					}
 					else
 					{
-						clearCharArray(buffer[0], arrSize);
+						clearCharArray(buffer[0], buffSize);
 					}
+
+					lastTotalFactor = Trie::totalFactor;
+				}
+				else
+				{
+					clearCharArray(buffer[0], buffSize);
 				}
 			}
-			//for the last word in file
-			if (arrSize > 0 &&
-				(getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25))
-			{
-				++wordCount;
-			}
-
-			dict.searchWord(buffer, arrSize);
-			wordFile.close();
 		}
-		else
+		//for the last word in file
+		if (buffSize > 0 &&
+			(getCode(buffer[0]) >= 0 && getCode(buffer[0]) <= 25))
 		{
-			cerr << "Unable to open file " << argv[i] << "\n";
-			exit(EXIT_FAILURE);
+			++wordCount;
 		}
+
+		dict.searchWord(buffer, buffSize);
+		wordFile.close();
 	}
+	else
+	{
+		cerr << "Unable to open file " << fileName << "\n";
+		exit(EXIT_FAILURE);
+	}
+
 	return Trie::totalFactor;
 }
 
@@ -183,8 +182,8 @@ int main(int argc, char* argv[])
 {
 	if (argc < 3)
 	{
-		cerr << "Usage: " << argv[0] << " <FILENAME 1> <FILENAME 2> ... <FILENAME N>" << "\n";
-		std::system("pause");
+		cerr << "Usage: " << argv[0] << " <fileName 1> <fileName 2> ... <fileName N>" << "\n";
+		system("pause");
 		exit(EXIT_FAILURE);
 	}
 
@@ -192,16 +191,25 @@ int main(int argc, char* argv[])
 	int wordCount = 0;
 
 	populateDictionary(argv[1], dict);
-	double factor = calculateFactor(argc, argv, wordCount, dict);
-
+	double factor = 0;
+	char* fileName;
 	double result = 0;
-	if (wordCount != 0)
-	{
-		result = factor / double(wordCount);
-	}
-	
-	cout << result << endl;
 
-	std::system("pause");
+	for (int i = 2; i < argc; i++)
+	{
+		wordCount = 0;
+		Trie::totalFactor = 0;
+		fileName = argv[i];
+
+		factor = calculateFactor(fileName, wordCount, dict);
+		if (wordCount != 0)
+		{
+			result = factor / double(wordCount);
+		}
+
+		cout << fileName << " " << result << endl;
+	}
+
+	system("pause");
 	return 0;
 }
